@@ -1,0 +1,44 @@
+import com.bootlabs.springbootdroolsruleengine.model.EmployeeRequest;
+import com.bootlabs.springbootdroolsruleengine.model.EmployeeType;
+global com.bootlabs.springbootdroolsruleengine.model.EmployeeResponse employeeResponse;
+
+dialect "mvel"
+
+rule "Get employee weekly"
+	when
+	then
+		System.out.println("==========employee weekly ============= ");
+		employeeResponse.setWeeklyRate(40 * 15);
+end
+
+rule "Get employee overtime"
+	when
+         $dept: EmployeeRequest(hoursWorked > 40);
+	then
+		System.out.println("==========employee overtime overtime ============= "+ $dept.getHoursWorked);
+		employeeResponse.setOvertime($dept.getHoursWorked);
+		employeeResponse.setOvertimeRate(($dept.hoursWorked - 40) * 8);
+end
+
+rule "Get bonus > 2000"
+	when
+         $dept: EmployeeRequest(sales > 2000);
+	then
+		System.out.println("==========employee bonus ============= ");
+		employeeResponse.setBonus($dept.sales * 0.15);
+end
+
+rule "Get bonus < 2000"
+	when
+         $bonn: EmployeeRequest(sales < 2000 && > 750);
+	then
+		System.out.println("==========employee bonus 750============= ");
+		employeeResponse.setBonus($bonn.sales * 0.10);
+end
+
+rule "Get employee weekly total"
+	when
+	then
+		System.out.println("==========employee weekly salary============= "+ employeeResponse.getOvertimeRate +"--- "+ employeeResponse.getWeeklyRate + "------ "+employeeResponse.getBonus);
+		employeeResponse.setWeeklySalary(employeeResponse.getOvertimeRate + employeeResponse.getWeeklyRate + employeeResponse.getBonus);
+end
